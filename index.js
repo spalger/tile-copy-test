@@ -1,3 +1,5 @@
+import { createWriteStream } from 'fs'
+
 import tilelive from 'tilelive'
 import tileliveHttp from 'tilelive-http'
 import mbtiles from 'mbtiles'
@@ -9,6 +11,7 @@ import { fromCallback as fcb } from 'bluebird'
 
   const input = process.env.INPUT
   const output = process.env.OUTPUT
+  const progressLog = createWriteStream('tiles.progress.log')
 
   debugger
 
@@ -24,7 +27,7 @@ import { fromCallback as fcb } from 'bluebird'
       retry: true,
       timeout: 60000 * 4,
       onslow: (...args) => console.log(':SLOW  ', ...args),
-      progress: (...args) => console.log(':PROGRESS  ', ...args),
+      progress: (stats, progress) => progressLog.write(`${JSON.stringify({ stats, progress })}\n`),
     },
     cb,
   ))
